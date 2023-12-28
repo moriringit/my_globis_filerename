@@ -4,6 +4,23 @@ import logging
 import re
 import sys
 
+############################################
+# URLファイルを作成する
+def _createUrlFile(old_name, new_path) :
+    template="[InternetShortcut]\nURL={URL}"
+    outStr = template.format(URL=old_name)
+    try:
+        f = open(new_path + ".url", 'w')
+        f.write(outStr)
+        f.close()
+        logging.info(f'URL {old_name} のURLファイルを作成したよ。: {new_path+".url"}')
+        return True
+    except:
+        logging.warning(f'URLファイルを作成できませんでした。: {old_name}')
+        return False
+############################################
+
+
 #引数があれば、引数からファイルパスを指定する
 folder_path = ""
 if 1 < len(sys.argv):
@@ -29,7 +46,7 @@ with open(folder_path + '/' + 'ReadMe.csv', 'r', encoding='cp932') as csvfile:
             ## add day number change start ## 
             pattern = '^[A-Z]{3}_(Day\d_)'
             re_result = re.match(pattern, old_name)
-            prefix_day = ""
+            prefix_day = "Day★_"
             if None != re_result :
                 prefix_day = re_result.group(1)
             ## add day number change end ##
@@ -42,6 +59,11 @@ with open(folder_path + '/' + 'ReadMe.csv', 'r', encoding='cp932') as csvfile:
                 os.rename(old_path, new_path)
                 logging.info(f'名前を {old_name} から {new_name_with_ext}へ変更したよ。')
             except (FileNotFoundError, OSError) :
+                # http://またはhttps://から始まる場合はURLファイルを作成する。
+                if old_name.startswith("http://") or old_name.startswith("https://") :
+                    result = _createUrlFile(old_name, new_path)
+                    continue
+
                 logging.warning(f'ファイルが見つからないよ。: {old_name}')
         except UnicodeDecodeError:
             continue  # skip rows that contain non-UTF-8 characters
