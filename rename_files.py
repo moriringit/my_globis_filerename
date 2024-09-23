@@ -44,7 +44,7 @@ with open(folder_path + '/' + 'ReadMe.csv', 'r', encoding='cp932') as csvfile:
             old_name = row[2]  # assumes the file names are in the first column of the CSV file
             new_name = row[1]  # assumes the new names are in the second column of the CSV file
             ## add day number change start ## 
-            pattern = '^[A-Z]{3}_(Day\d_)'
+            pattern = r'^[A-Z]{3}_(Day\d_)'
             re_result = re.match(pattern, old_name)
             prefix_day = "Day★_"
             if None != re_result :
